@@ -1,35 +1,28 @@
-// index.js - Basic Express server with Nodemon setup
-
-// 1. Import required modules
 const express = require("express");
+const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 const path = require("path");
+const mongoose = require("mongoose");
+const connectDB = require("./controllers/dbDriver");
 
-// 2. Create Express application
+dotenv.config();
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-// 3. Middleware
-app.use(express.json()); // For parsing application/json
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+// Parse JSON
+app.use(express.json());
+app.use(bodyParser.json());
 
-// 4. Serve static files (optional)
-app.use(express.static(path.join(__dirname, "public")));
+// Connect to MongoDB
+connectDB();
 
-// 5. Basic route
-app.get("/", (req, res) => {
-  res.send("Hello World! Server is running with Nodemon 🚀");
+// API routes
+const userRoutes = require("./routes/userRoute");
+
+app.use("/api/user", userRoutes);
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });
-
-// 6. Another example route
-app.get("/api/greet", (req, res) => {
-  res.json({ message: "Welcome to our API!", timestamp: new Date() });
-});
-
-// 7. Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  console.log("Nodemon is watching for changes...");
-});
-
-// 8. Export app for testing purposes (optional)
-module.exports = app;
